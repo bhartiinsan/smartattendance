@@ -1,0 +1,19 @@
+{
+  "name": "smart-attendance",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/server.js",
+    "start": "bun run src/server.js",
+    "build": "bun build src/server.js --outdir dist"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "mysql2": "^3.9.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcrypt": "^5.1.0",
+    "zod": "^3.22.0",
+    "cors": "^2.8.0",
+    "dotenv": "^16.4.0"
+  }
+}

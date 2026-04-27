@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-mode">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAA | The Intelligent Campus Ecosystem</title>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --bg-secondary: #0a0a0c;
+            --primary: #6366f1; /* Indigo */
+            --primary-glow: rgba(99, 102, 241, 0.6);
+            --accent: #a855f7; /* Purple */
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hide default cursor */ }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* --- NEON CURSOR (FIXED VISIBILITY) --- */
+        .cursor-dot {
+            width: 10px; height: 10px; background: var(--primary);
+            position: fixed; border-radius: 50%; z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 0 15px var(--primary-glow);
+            transition: transform 0.1s;
+        }
+        .cursor-circle {
+            width: 40px; height: 40px; 
+            border: 1px solid var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            position: fixed; border-radius: 50%; z-index: 9998;
+            pointer-events: none; transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.3s, border-color 0.3s;
+        }
+        
+        /* Hover State */
+        body.hovering .cursor-circle {
+            width: 70px; height: 70px;
+            background: rgba(99, 102, 241, 0.15);
+            border-color: transparent;
+            backdrop-filter: blur(2px);
+        }
+        /* Text Hover State */
+        body.hovering-text .cursor-circle {
+            width: 60px; height: 60px;
+            background: white;
+            border-color: white;
+            mix-blend-mode: difference;
+        }
+        /* Make cursor act like a lens on text hover */
+        body.hovering-text .cursor-dot {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* --- BACKGROUND FX --- */
+        .ambient-light {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .light-orb {
+            position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.3;
+            animation: floatOrb 15s infinite alternate ease-in-out;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--primary); }
+        .orb-2 { bottom: -10%; right: -20%; width: 60vw; height: 60vw; background: var(--accent); animation-delay: -5s; }
+        
+        @keyframes floatOrb { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px, -30px) scale(1.1); } }
+        
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.06;
+            background-image: linear-gradient(var(--border-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+
+        /* --- TYPOGRAPHY UTILS --- */
+        h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .gradient-accent {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed; width: 100%; padding: 2rem 6%; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        nav.scrolled {
+            padding: 1.2rem 6%; background: rgba(5, 5, 7, 0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+
+        .nav-link {
+            text-decoration: none; color: var(--text-muted); font-weight: 500; margin-left: 2rem;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-link:hover { color: white; }
+        
+        /* --- HERO --- */
+        header.hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 10%; position: relative;
+        }
+        
+        .hero-badge {
+            padding: 8px 16px; border-radius: 50px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;
+            margin-bottom: 2rem; opacity: 0; animation: fadeUp 1s ease 0.2s forwards;
+            backdrop-filter: blur(5px);
+        }
+        .hero h1 {
+            font-size: clamp(3.5rem, 8vw, 6.5rem); line-height: 1; font-weight: 700; margin-bottom: 1.5rem;
+            opacity: 0; animation: fadeUp 1s ease 0.4s forwards;
+        }
+        .hero p {
+            font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin-bottom: 3rem;
+            opacity: 0; animation: fadeUp 1s ease 0.6s forwards;
+        }
+        
+        .btn-group { display: flex; gap: 1rem; opacity: 0; animation: fadeUp 1s ease 0.8s forwards; }
+        .magnetic-btn {
+            padding: 16px 36px; border-radius: 12px; font-weight: 600; text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-primary {
+            background: white; color: black; position: relative; overflow: hidden;
+        }
+        .btn-primary:hover { box-shadow: 0 0 40px rgba(255,255,255,0.3); }
+        .btn-ghost {
+            background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border-color);
+        }
+        .btn-ghost:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+        /* --- STATS STRIP --- */
+        .stats-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
+            padding: 4rem 10%; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.01);
+        }
+        .stat-item h3 { font-size: 2.5rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
+        .stat-item p { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+
+        /* --- SECTIONS --- */
+        section { padding: 140px 10%; position: relative; }
+        .section-title { font-size: 3rem; margin-bottom: 1rem; color: white; }
+        .section-subtitle { color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 1rem; }
+
+        /* --- FEATURES GRID --- */
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 4rem; }
+        
+        .feature-card {
+            padding: 3rem; background: var(--bg-secondary); border: 1px solid var(--border-color);
+            border-radius: 24px; position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2); }
+        .feature-card h3 { font-size: 1.5rem; margin: 1.5rem 0 1rem; }
+        .feature-card p { color: var(--text-muted); line-height: 1.7; }
+        .feature-icon {
+            font-size: 2rem; color: var(--primary); width: 60px; height: 60px;
+            background: rgba(99, 102, 241, 0.1); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- UPGRADED WORKFLOW CARDS --- */
+        .workflow-step {
+            display: flex; align-items: center; gap: 6rem; margin-bottom: 8rem;
+        }
+        .workflow-step:nth-child(even) { flex-direction: row-reverse; }
+        
+        .step-content { flex: 1; }
+        .step-number { font-size: 6rem; font-weight: 800; color: rgba(255,255,255,0.03); line-height: 0.8; margin-bottom: 1.5rem; font-family: var(--font-display); }
+        
+        .step-visual {
+            flex: 1.2; height: 380px; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border-color); border-radius: 32px; 
+            position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease;
+        }
+        .step-visual:hover { transform: scale(1.02); border-color: rgba(255,255,255,0.15); }
+        
+        /* UI MOCKUP STYLES */
+        .ui-mockup {
+            width: 80%; height: 70%; background: #0f0f11;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; overflow: hidden;
+            position: relative;
+        }
+        .ui-header {
+            height: 40px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; padding: 0 16px; gap: 8px; background: rgba(255,255,255,0.02);
+        }
+        .ui-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .ui-dot.red { background: #ff5f57; }
+        .ui-dot.yellow { background: #febc2e; }
+        .ui-dot.green { background: #28c840; }
+        
+        .ui-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* Specific Mockup Elements */
+        .mock-btn { width: 120px; height: 32px; background: var(--primary); border-radius: 6px; margin-top: auto; align-self: flex-end; }
+        .mock-row { height: 12px; background: rgba(255,255,255,0.05); border-radius: 4px; width: 100%; }
+        .mock-row.short { width: 60%; }
+        .mock-stat { display: flex; gap: 10px; }
+        .mock-box { flex: 1; height: 60px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .glow-effect {
+            position: absolute; width: 200px; height: 200px; background: var(--primary);
+            filter: blur(80px); opacity: 0.15; z-index: -1;
+        }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            background: var(--primary); color: white; padding: 1.5rem 0; overflow: hidden; white-space: nowrap; position: relative;
+            transform: rotate(-1deg) scale(1.05); margin: 4rem 0;
+        }
+        .marquee-content { display: inline-block; animation: scroll 20s linear infinite; font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; text-transform: uppercase; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 5rem 10% 2rem; background: #020203; border-top: 1px solid var(--border-color);
+        }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+        .footer-brand h2 { font-size: 1.5rem; margin-bottom: 1rem; color: white; }
+        .footer-links h4 { color: white; margin-bottom: 1.5rem; }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: color 0.2s; }
+        .footer-links a:hover { color: var(--primary); }
+        
+        .copy { border-top: 1px solid var(--border-color); padding-top: 2rem; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.9rem; }
+
+        /* Animations */
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        .pulse-slow { animation: pulse 4s infinite ease-in-out; }
+        @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.3; } 100% { opacity: 0.1; } }
+
+        @media(max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .stats-strip { grid-template-columns: 1fr 1fr; }
+            .workflow-step { flex-direction: column !important; gap: 2rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .cursor-circle, .cursor-dot { display: none; } /* No cursor on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-circle"></div>
+
+    <!-- Background -->
+    <div class="ambient-light">
+        <div class="light-orb orb-1"></div>
+        <div class="light-orb orb-2"></div>
+    </div>
+    <div class="grid-bg"></div>
+
+    <!-- Nav -->
+    <nav>
+        <div class="logo">
+            <i class="ri-flashlight-fill"></i> SCAA
+        </div>
+        <div style="display:flex; align-items:center; gap: 2rem;">
+            <div class="desktop-links" style="display:flex;">
+                <a href="#features" class="nav-link" data-hover-type="text">Features</a>
+                <a href="#workflow" class="nav-link" data-hover-type="text">How it Works</a>
+            </div>
+            <a href="index.html" class="magnetic-btn btn-primary" data-hover-type="button" style="padding: 10px 24px; font-size: 0.9rem;">
+                Launch App
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-badge">v2.0 Now Available</div>
+        <h1>The Intelligent<br><span class="gradient-accent">Campus Ecosystem</span></h1>
+        <p>A unified, paperless infrastructure for attendance, activities, and academic engagement. Built for high-performance institutions.</p>
+        
+        <div class="btn-group">
+            <a href="index.html" class="magnetic-btn btn-primary" data-hover-type="button">
+                Get Started <i class="ri-arrow-right-line"></i>
+            </a>
+            <a href="#features" class="magnetic-btn btn-ghost" data-hover-type="button">
+                System Tour
+            </a>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-strip reveal">
+        <div class="stat-item">
+            <h3>0.1s</h3>
+            <p>Data Latency</p>
+        </div>
+        <div class="stat-item">
+            <h3>100%</h3>
+            <p>Paperless</p>
+        </div>
+        <div class="stat-item">
+            <h3>RBAC</h3>
+            <p>Secure Access</p>
+        </div>
+        <div class="stat-item">
+            <h3>24/7</h3>
+            <p>Availability</p>
+        </div>
+    </div>
+
+    <!-- Core Features -->
+    <section id="features">
+        <span class="section-subtitle">Core Architecture</span>
+        <h2 class="section-title">Engineered for <span class="gradient-text">Speed</span>.</h2>
+        
+        <div class="grid-3">
+            <div class="feature-card reveal" data-hover-type="card">
+                <div class="feature-icon"><i class="ri-shield-keyhole-line"></i></div>
+                <h3>Unified Identity</h3>
+                <p>Role-Based Access Control (RBAC) creates distinct, secure environments for Students and Faculty within a single cohesive database structure.</p>
+            </div>
+            <div class="feature-card reveal" data-hover-type="card">
+                <div class="feature-icon"><i class="ri-fingerprint-line"></i></div>
+                <h3>Digital Attendance</h3>
+                <p>Replace manual logs with one-tap digital marking. Algorithms calculate percentages instantly and flag shortages automatically.</p>
+            </div>
+            <div class="feature-card reveal" data-hover-type="card">
+                <div class="feature-icon"><i class="ri-radar-fill"></i></div>
+                <h3>Activity Hub</h3>
+                <p>A real-time event wall. Students can browse, register, and track participation in campus events without physical notices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee Break -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            Efficiency &nbsp; • &nbsp; Transparency &nbsp; • &nbsp; Automation &nbsp; • &nbsp; Security &nbsp; • &nbsp; Analytics &nbsp; • &nbsp; 
+            Efficiency &nbsp; • &nbsp; Transparency &nbsp; • &nbsp; Automation &nbsp; • &nbsp; Security &nbsp; • &nbsp; Analytics &nbsp; • &nbsp;
+        </div>
+    </div>
+
+    <!-- Workflow -->
+    <section id="workflow">
+        <span class="section-subtitle">Workflow</span>
+        <h2 class="section-title">How it <span class="gradient-text">Works</span>.</h2>
+        <div style="height: 40px;"></div>
+
+        <!-- Step 1: Admin Create -->
+        <div class="workflow-step reveal">
+            <div class="step-content">
+                <div class="step-number">01</div>
+                <h3>Faculty Initiation</h3>
+                <p style="color:var(--text-muted); font-size: 1.1rem; margin-top: 1rem;">Faculty logs into the secure portal to create an activity or open an attendance session. The system generates a unique session ID automatically.</p>
+            </div>
+            <div class="step-visual" data-hover-type="card">
+                <div class="glow-effect"></div>
+                <!-- Mini UI: Form Creation -->
+                <div class="ui-mockup">
+                    <div class="ui-header">
+                        <div class="ui-dot red"></div><div class="ui-dot yellow"></div><div class="ui-dot green"></div>
+                    </div>
+                    <div class="ui-body">
+                        <div class="mock-row short" style="background: rgba(255,255,255,0.2);"></div>
+                        <div class="mock-row"></div>
+                        <div class="mock-row"></div>
+                        <div style="flex:1"></div>
+                        <div class="mock-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600;">Create Event</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Student View -->
+        <div class="workflow-step reveal">
+            <div class="step-content">
+                <div class="step-number">02</div>
+                <h3>Student Interaction</h3>
+                <p style="color:var(--text-muted); font-size: 1.1rem; margin-top: 1rem;">Students access their dashboard to view live stats. They can register for events instantly or check their attendance percentage in real-time.</p>
+            </div>
+            <div class="step-visual" data-hover-type="card">
+                <div class="glow-effect" style="background: var(--accent);"></div>
+                <!-- Mini UI: Stats Dashboard -->
+                <div class="ui-mockup" style="border-color: rgba(168, 85, 247, 0.3);">
+                    <div class="ui-header">
+                        <div class="ui-dot red"></div><div class="ui-dot yellow"></div><div class="ui-dot green"></div>
+                    </div>
+                    <div class="ui-body">
+                         <div style="display:flex; justify-content: space-between;">
+                             <div class="mock-row short" style="width: 40%;"></div>
+                             <div class="mock-row short" style="width: 20%; background: var(--accent);"></div>
+                         </div>
+                         <div class="mock-stat">
+                             <div class="mock-box" style="display: flex; flex-direction:column; justify-content:center; align-items:center;">
+                                 <div style="width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 50%;"></div>
+                             </div>
+                             <div class="mock-box"></div>
+                         </div>
+                         <div class="mock-row" style="margin-top: 10px;"></div>
+                         <div class="mock-row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section style="text-align: center; padding: 100px 10%;">
+        <h2 style="font-size: 3rem; margin-bottom: 1.5rem;">Ready to upgrade your campus?</h2>
+        <p style="color:var(--text-muted); margin-bottom: 3rem;">Join the digital revolution. Zero paper. Zero hassle.</p>
+        <a href="index.html" class="magnetic-btn btn-primary" data-hover-type="button" style="transform: scale(1.2);">
+            Launch Portal Now
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h2>SCAA.</h2>
+                <p style="color:var(--text-muted); max-width: 300px;">The Smart Curriculum Activity & Attendance App. Defining the future of educational management systems.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#">Faculty Portal</a></li>
+                    <li><a href="#">Student Portal</a></li>
+                    <li><a href="#">Admin Console</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copy">
+            &copy; 2025 SCAA Project. Built for Excellence.
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- PHYSICS CURSOR ---
+        const dot = document.querySelector('.cursor-dot');
+        const circle = document.querySelector('.cursor-circle');
+        
+        let mouseX = 0, mouseY = 0;
+        let circleX = 0, circleY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Dot follows instantly
+            dot.style.transform = `translate(${mouseX - 5}px, ${mouseY - 5}px)`;
+        });
+
+        // Smooth Lerp for Circle
+        function animateCursor() {
+            // Lerp formula: current + (target - current) * factor
+            circleX += (mouseX - circleX) * 0.15;
+            circleY += (mouseY - circleY) * 0.15;
+            
+            circle.style.transform = `translate(${circleX - 20}px, ${circleY - 20}px)`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // --- HOVER EFFECTS ---
+        const interactables = document.querySelectorAll('[data-hover-type]');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                const type = el.getAttribute('data-hover-type');
+                if(type === 'text') document.body.classList.add('hovering-text');
+                else document.body.classList.add('hovering');
+            });
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('hovering', 'hovering-text');
+            });
+            
+            // Magnetic Effect
+            if(el.classList.contains('magnetic-btn')) {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    // Pull button towards mouse
+                    el.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.style.transform = 'translate(0, 0)';
+                });
+            }
+        });
+
+        // --- SCROLL REVEAL ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- NAVBAR SCROLL ---
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if(window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+    </script>
+
+</body>
+</html>
